@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Motivision.Infrastructure.Persistence;
 
@@ -11,9 +12,10 @@ using Motivision.Infrastructure.Persistence;
 namespace Motivision.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppBusinessDbContext))]
-    partial class AppBusinessDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250716175203_AddBusinessTables")]
+    partial class AddBusinessTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,15 +34,6 @@ namespace Motivision.Infrastructure.Persistence.Migrations
 
                     b.Property<DateTime?>("EndTime")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsInterrupted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("Mode")
-                        .HasColumnType("int");
 
                     b.Property<string>("Notes")
                         .HasMaxLength(500)
