@@ -28,6 +28,7 @@ namespace Motivision.Application
             // Private Claimes -UserDefined-
             var authCalims = new List<Claim>()
             {
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.GivenName, user.FullName)
             };
