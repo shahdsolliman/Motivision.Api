@@ -17,9 +17,6 @@ namespace Motivision.Infrastructure.Persistence.Config
         {
             builder.HasKey(fs => fs.Id);
 
-            builder.Property(fs => fs.StartTime)
-                   .IsRequired();
-
             builder.Property(fs => fs.Notes)
                    .HasMaxLength(500);
 

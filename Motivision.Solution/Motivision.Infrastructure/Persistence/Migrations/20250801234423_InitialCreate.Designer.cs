@@ -12,8 +12,8 @@ using Motivision.Infrastructure.Persistence;
 namespace Motivision.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppBusinessDbContext))]
-    [Migration("20250718125225_Add_IsCompleted_IsInterrupted_Mode_To_FocusSession")]
-    partial class Add_IsCompleted_IsInterrupted_Mode_To_FocusSession
+    [Migration("20250801234423_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -24,7 +24,7 @@ namespace Motivision.Infrastructure.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("Motivision.Core.Business.Entities.FocusSession", b =>
+            modelBuilder.Entity("FocusSession", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -32,13 +32,16 @@ namespace Motivision.Infrastructure.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("EndTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsInterrupted")
+                    b.Property<bool>("IsStarted")
                         .HasColumnType("bit");
 
                     b.Property<int>("Mode")
@@ -51,14 +54,21 @@ namespace Motivision.Infrastructure.Persistence.Migrations
                     b.Property<string>("SessionCategory")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("SessionStatus")
+                        .HasColumnType("int");
+
                     b.Property<string>("SessionType")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("SkillId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("StartTime")
+                    b.Property<DateTime?>("StartTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -108,7 +118,7 @@ namespace Motivision.Infrastructure.Persistence.Migrations
                     b.ToTable("Skills");
                 });
 
-            modelBuilder.Entity("Motivision.Core.Business.Entities.FocusSession", b =>
+            modelBuilder.Entity("FocusSession", b =>
                 {
                     b.HasOne("Motivision.Core.Business.Entities.Skill", "Skill")
                         .WithMany("FocusSessions")

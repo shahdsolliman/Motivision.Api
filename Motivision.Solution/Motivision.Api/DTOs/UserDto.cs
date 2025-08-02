@@ -1,4 +1,4 @@
-﻿namespace SnapShop.API.Dtos
+﻿namespace Motivision.API.Dtos
 {
     public class UserDto
     {

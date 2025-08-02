@@ -4,10 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Motivision.Api.Controllers;
 using Motivision.Api.DTOs;
 using Motivision.API.Errors;
-using Motivision.Application.Features.FocusSessions.Commands;
-using Motivision.Application.Features.FocusSessions.Queries;
-using Motivision.Application.Interfaces;
 using Motivision.Application.Services;
+using Motivision.Core.Business.Enums;
+using Motivision.Core.Contracts.Services;
 using Motivision.Core.Contracts.Services.Contracts;
 using System.Security.Claims;
 
@@ -16,71 +15,104 @@ namespace Motivision.API.Controllers
     [Authorize]
     public class FocusSessionsController : BaseApiController
     {
-        private readonly IFocusSessionService _sessionService;
+        private readonly IFocusSessionService _focusSessionService;
         private readonly IMapper _mapper;
 
         public FocusSessionsController(IFocusSessionService sessionService,
             IMapper mapper)
         {
-            _sessionService = sessionService;
+            _focusSessionService = sessionService;
             _mapper = mapper;
         }
 
-        private string GetUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-
-        [HttpGet]
-        public async Task<IActionResult> GetAllUserSessions()
+        private string GetUserId()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var entities = await _sessionService.GetUserSessionsAsync(userId);
-            var dtos = _mapper.Map<List<FocusSessionDto>>(entities);
-            return Ok(dtos);
+            return User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new UnauthorizedAccessException();
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetSessionById(int id)
+        [HttpPost]
+        public async Task<ActionResult<DetailsFocusSessionDto>> CreateSession(CreateFocusSessionDto dto)
         {
             var userId = GetUserId();
-            var entity = await _sessionService.GetByIdAsync(id, userId);
-            if (entity == null) return NotFound();
+            var session = _mapper.Map<FocusSession>(dto);
+            session.UserId = userId;
 
-            var dto = _mapper.Map<FocusSessionDto>(entity);
-            return Ok(dto);
+            var created = await _focusSessionService.CreateSessionAsync(session);
+            var result = _mapper.Map<DetailsFocusSessionDto>(created);
+
+            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
-        [Authorize]
         [HttpPost("start")]
-        public async Task<IActionResult> StartSession([FromBody] CreateFocusSessionCommand command)
+        public async Task<ActionResult> StartSession(StartFocusSessionDto dto)
         {
-            command.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            var userId = GetUserId();
+            var success = await _focusSessionService.StartSessionAsync(dto.Id, userId);
 
-            var result = await _sessionService.StartSessionAsync(command);
-            return Ok(result);
+            if (!success)
+                return BadRequest(new ApiResponse(400, "Session could not be started."));
+
+            return Ok(new ApiResponse(200, "Session started successfully."));
         }
-
-
 
         [HttpPost("end")]
-        public async Task<IActionResult> EndSession([FromBody] EndFocusSessionCommand command)
+        public async Task<ActionResult> EndSession(EndFocusSessionDto dto)
         {
-            var result = await _sessionService.EndSessionAsync(command);
-            return result ? Ok(new { Message = "Session ended." }) : NotFound();
+            var userId = GetUserId();
+            var success = await _focusSessionService.EndSessionAsync(dto.Id, userId);
+
+            if (!success)
+                return BadRequest(new ApiResponse(400, "Session could not be ended."));
+
+            return Ok(new ApiResponse(200, "Session ended successfully."));
         }
 
-        [HttpPut("update")]
-        public async Task<IActionResult> UpdateSession([FromBody] UpdateFocusSessionCommand command)
+        [HttpPut]
+        public async Task<ActionResult> UpdateSession(UpdateFocusSessionDto dto)
         {
-            var result = await _sessionService.UpdateSessionAsync(command);
-            return result ? Ok(new { Message = "Session updated." }) : NotFound();
+            var userId = GetUserId();
+            var session = _mapper.Map<UpdateFocusSessionDto, FocusSession>(dto);
+            var success = await _focusSessionService.UpdateSessionAsync(session, userId);
+
+            if (!success)
+                return NotFound(new ApiResponse(404, "Session not found or unauthorized"));
+
+            return Ok(new ApiResponse(200, "Session updated successfully."));
         }
+
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSession(int id)
+        public async Task<ActionResult> DeleteSession(int id)
         {
-            var result = await _sessionService.DeleteSessionAsync(id);
-            return result ? Ok(new { Message = "Session deleted." }) : NotFound();
+            var userId = GetUserId();
+            var success = await _focusSessionService.DeleteSessionAsync(id, userId);
+
+            if (!success)
+                return NotFound(new ApiResponse(404, "Session not found or unauthorized"));
+
+            return Ok(new ApiResponse(200, "Session deleted successfully."));
         }
 
 
+        [HttpGet("{id}")]
+        public async Task<ActionResult<DetailsFocusSessionDto>> GetById(int id)
+        {
+            var userId = GetUserId();
+            var session = await _focusSessionService.GetByIdAsync(id, userId);
+
+            if (session == null)
+                return NotFound(new ApiResponse(404, "Session not found."));
+
+            return Ok(_mapper.Map<DetailsFocusSessionDto>(session));
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IReadOnlyList<ListFocusSessionDto>>> GetAll()
+        {
+            var userId = GetUserId();
+            var sessions = await _focusSessionService.GetAllSessionsAsync(userId);
+
+            return Ok(_mapper.Map<IReadOnlyList<ListFocusSessionDto>>(sessions));
+        }
     }
 }

@@ -5,16 +5,17 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Motivision.API.Errors;
 using Motivision.Application;
-using Motivision.Application.Features.FocusSessions.Validators;
-using Motivision.Application.Interfaces;
-using Motivision.Application.Services;
 using Motivision.Core.Contracts.Services.Contracts;
 using Motivision.Infrastructure.Persistence;
 using Motivision.Infrastructure.Persistence.Identity;
-using SnapShop.API.Helpers;
+using Motivision.API.Helpers;
 using System.Linq;
 using System.Text.Json.Serialization;
-using ApplicationAssembly = Motivision.Application.AssemblyReference;
+using Motivision.Core.Contracts.Services;
+using Motivision.Application.Services;
+using Motivision.Core.Contracts;
+using Motivision.Infrastructure.UnitOfWork;
+using Motivision.Infrastructure.Repositories;
 
 
 namespace Motivision.Api.Extensions
@@ -28,7 +29,6 @@ namespace Motivision.Api.Extensions
             services.AddIdentityDbContextServices(configuration);
             services.AddDbContextServices(configuration);
             services.AddAutoMapperServices();
-            services.AddMediatorServices();
             services.AddUserDefinedServices();
 
             return services;
@@ -58,8 +58,6 @@ namespace Motivision.Api.Extensions
             });
 
             services.AddControllers()
-                    .AddFluentValidation(fv =>
-                      fv.RegisterValidatorsFromAssemblyContaining<CreateFocusSessionValidator>())
                     .AddJsonOptions(options =>
                     {
                         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumMemberConverter());
@@ -99,17 +97,15 @@ namespace Motivision.Api.Extensions
             return services;
         }
 
-        private static IServiceCollection AddMediatorServices(this IServiceCollection services)
-        {
-            services.AddMediatR(cfg =>
-                cfg.RegisterServicesFromAssembly(typeof(ApplicationAssembly).Assembly));
-            return services;
-        }
 
         private static IServiceCollection AddUserDefinedServices(this IServiceCollection services)
         {
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IFocusSessionService, FocusSessionService>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+
             return services;
         }
     }

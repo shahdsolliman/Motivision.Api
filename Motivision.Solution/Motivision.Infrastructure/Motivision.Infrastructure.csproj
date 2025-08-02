@@ -8,8 +8,6 @@
 
   <ItemGroup>
     <Folder Include="Persistence\Identity\Migrations\" />
-    <Folder Include="UnitOfWork\" />
-    <Folder Include="Repositories\" />
     <Folder Include="Persistence\Migrations\" />
   </ItemGroup>
 

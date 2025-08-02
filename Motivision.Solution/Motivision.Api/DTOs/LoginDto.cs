@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SnapShop.API.Dtos
+namespace Motivision.API.Dtos
 {
     public class LoginDto
     {
