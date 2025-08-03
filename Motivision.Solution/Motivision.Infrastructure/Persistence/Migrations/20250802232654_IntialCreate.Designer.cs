@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Motivision.Infrastructure.Persistence;
 
@@ -11,9 +12,10 @@ using Motivision.Infrastructure.Persistence;
 namespace Motivision.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppBusinessDbContext))]
-    partial class AppBusinessDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250802232654_IntialCreate")]
+    partial class IntialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

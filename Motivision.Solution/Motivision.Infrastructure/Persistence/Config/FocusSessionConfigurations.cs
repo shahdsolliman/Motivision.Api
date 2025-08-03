@@ -17,9 +17,6 @@ namespace Motivision.Infrastructure.Persistence.Config
         {
             builder.HasKey(fs => fs.Id);
 
-            builder.Property(fs => fs.StartTime)
-                   .IsRequired();
-
             builder.Property(fs => fs.Notes)
                    .HasMaxLength(500);
 
@@ -31,11 +28,6 @@ namespace Motivision.Infrastructure.Persistence.Config
                    .HasConversion(v => v.ToString(),
                    v => (SessionCategory)Enum.Parse(typeof(SessionCategory), v));
 
-            // Relationship with Skill (optional)
-            builder.HasOne(fs => fs.Skill)
-                   .WithMany(s => s.FocusSessions)
-                   .HasForeignKey(fs => fs.SkillId)
-                   .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

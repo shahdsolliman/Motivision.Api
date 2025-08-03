@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Motivision.Api.DTOs;
+using Motivision.Api.DTOs.Identity;
+using Motivision.API.Dtos;
 using Motivision.API.Errors;
 using Motivision.Core.Contracts.Services.Contracts;
 using Motivision.Core.Identity.Entities;
-using SnapShop.API.Dtos;
 using System.Net;
 using System.Security.Claims;
 
@@ -55,13 +55,18 @@ namespace Motivision.Api.Controllers
             var user = new AppUser()
             {
                 FullName = registerDto.DisplayName,
-                Email = registerDto.Email,
+                Email = registerDto.Email.ToLower(),
                 PhoneNumber = registerDto.PhoneNumber,
                 UserName = registerDto.Email.Split("@")[0]
             };
-            var result = await _userManager.CreateAsync(user);
+            var result = await _userManager.CreateAsync(user, registerDto.Password);
 
-            if (!result.Succeeded) return BadRequest(new ApiResponse(400));
+            if (!result.Succeeded)
+                return BadRequest(new ApiValidationErrorResponse
+                {
+                    Errors = result.Errors.Select(e => e.Description)
+                });
+
             return Ok(new UserDto()
             {
                 DisplayName = user.FullName,
@@ -103,7 +108,7 @@ namespace Motivision.Api.Controllers
         [HttpGet("emailexists")] //GET: /api/Accounts/emailexists?email=xxx
         public async Task<ActionResult<bool>> CheckEmailExists(string email)
         {
-            return await _userManager.FindByEmailAsync(email) != null;
+            return await _userManager.FindByEmailAsync(email.ToLower()) != null;
         }
 
         [Authorize]
@@ -145,6 +150,9 @@ namespace Motivision.Api.Controllers
 
             return Ok(new { Message = "Account deleted successfully." });
         }
+
+
+
 
     }
 }
