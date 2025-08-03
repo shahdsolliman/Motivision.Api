@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Motivision.Core.Business.Entities;
+using Motivision.Core.Business.Specifications;
 using Motivision.Core.Contracts;
 using Motivision.Infrastructure.Persistence;
 using System;
@@ -39,5 +40,26 @@ namespace Motivision.Infrastructure.Repositories
 
         public void Delete(T entity)
             => _dbContext.Set<T>().Remove(entity);
+
+        public async Task<T?> GetEntityWithSpecAsync(ISpecifications<T> spec)
+        {
+            return await ApplySpecification(spec).FirstOrDefaultAsync();
+        }
+
+        public async Task<IReadOnlyList<T>> ListAsync(ISpecifications<T> spec)
+        {
+            return await ApplySpecification(spec).ToListAsync();
+        }
+
+        public async Task<int> CountAsync(ISpecifications<T> spec)
+        {
+            return await ApplySpecification(spec).CountAsync();
+        }
+
+        private IQueryable<T> ApplySpecification(ISpecifications<T> spec)
+        {
+            return SpecificationEvaluator<T>.GetQuery(_dbContext.Set<T>().AsQueryable(), spec);
+        }
+
     }
 }

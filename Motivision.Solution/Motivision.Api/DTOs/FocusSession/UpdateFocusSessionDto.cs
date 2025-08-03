@@ -1,4 +1,4 @@
-﻿namespace Motivision.Api.DTOs
+﻿namespace Motivision.Api.DTOs.FocusSession
 {
     public class UpdateFocusSessionDto
     {
@@ -6,6 +6,5 @@
         public string? Title { get; set; }
         public string? Description { get; set; }
         public string? Notes { get; set; }
-        public int? SkillId { get; set; }
     }
 }

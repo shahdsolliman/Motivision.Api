@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Motivision.API.Dtos
+namespace Motivision.Api.DTOs.Identity
 {
     public class RegisterDto
     {

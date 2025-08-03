@@ -22,6 +22,8 @@ namespace Motivision.Core.Contracts.Services
 
         Task<IReadOnlyList<FocusSession>> GetSessionsByDateAsync(string userId, DateTime from, DateTime to);
         Task<int> CalculateUserStreakAsync(string userId);
+        Task<IReadOnlyList<FocusSession>> GetSessionsWithPaginationAsync(string userId, int skip, int take, string? sort);
+
 
 
     }

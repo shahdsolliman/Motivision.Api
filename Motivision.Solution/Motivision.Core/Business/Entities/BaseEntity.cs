@@ -9,5 +9,6 @@ namespace Motivision.Core.Business.Entities
     public class BaseEntity
     {
         public int Id { get; set; }
+        public DateTime LastUpdated { get; set; } = DateTime.UtcNow;
     }
 }

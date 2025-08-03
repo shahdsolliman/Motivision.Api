@@ -1,4 +1,4 @@
-﻿namespace Motivision.Api.DTOs
+﻿namespace Motivision.Api.DTOs.Identity
 {
     public class ChangePasswordDto
     {

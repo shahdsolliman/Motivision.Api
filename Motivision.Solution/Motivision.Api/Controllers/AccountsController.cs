@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Motivision.Api.DTOs;
+using Motivision.Api.DTOs.Identity;
 using Motivision.API.Dtos;
 using Motivision.API.Errors;
 using Motivision.Core.Contracts.Services.Contracts;

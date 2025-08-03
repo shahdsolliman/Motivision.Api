@@ -10,6 +10,5 @@ namespace Motivision.Api.DTOs
         public FocusMode Mode { get; set; }
         public SessionType? SessionType { get; set; }
         public SessionCategory? SessionCategory { get; set; }
-        public int? SkillId { get; set; }
     }
 }

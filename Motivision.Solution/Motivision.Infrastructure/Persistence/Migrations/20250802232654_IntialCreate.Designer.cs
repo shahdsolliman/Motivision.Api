@@ -12,8 +12,8 @@ using Motivision.Infrastructure.Persistence;
 namespace Motivision.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppBusinessDbContext))]
-    [Migration("20250801234423_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250802232654_IntialCreate")]
+    partial class IntialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -44,6 +44,9 @@ namespace Motivision.Infrastructure.Persistence.Migrations
                     b.Property<bool>("IsStarted")
                         .HasColumnType("bit");
 
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("Mode")
                         .HasColumnType("int");
 
@@ -60,9 +63,6 @@ namespace Motivision.Infrastructure.Persistence.Migrations
                     b.Property<string>("SessionType")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("SkillId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("StartTime")
                         .HasColumnType("datetime2");
 
@@ -76,12 +76,10 @@ namespace Motivision.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SkillId");
-
                     b.ToTable("FocusSessions");
                 });
 
-            modelBuilder.Entity("Motivision.Core.Business.Entities.Skill", b =>
+            modelBuilder.Entity("Motivision.Core.Business.Entities.Goal", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -89,25 +87,27 @@ namespace Motivision.Infrastructure.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("LastUpdated")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("ProgressPercentage")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -115,22 +115,82 @@ namespace Motivision.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Skills");
+                    b.ToTable("Goals");
+                });
+
+            modelBuilder.Entity("Motivision.Core.Business.Entities.GoalStep", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("FocusSessionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GoalId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FocusSessionId")
+                        .IsUnique()
+                        .HasFilter("[FocusSessionId] IS NOT NULL");
+
+                    b.HasIndex("GoalId");
+
+                    b.ToTable("Steps");
+                });
+
+            modelBuilder.Entity("Motivision.Core.Business.Entities.GoalStep", b =>
+                {
+                    b.HasOne("FocusSession", "FocusSession")
+                        .WithOne("GoalStep")
+                        .HasForeignKey("Motivision.Core.Business.Entities.GoalStep", "FocusSessionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Motivision.Core.Business.Entities.Goal", "Goal")
+                        .WithMany("Steps")
+                        .HasForeignKey("GoalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FocusSession");
+
+                    b.Navigation("Goal");
                 });
 
             modelBuilder.Entity("FocusSession", b =>
                 {
-                    b.HasOne("Motivision.Core.Business.Entities.Skill", "Skill")
-                        .WithMany("FocusSessions")
-                        .HasForeignKey("SkillId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Skill");
+                    b.Navigation("GoalStep");
                 });
 
-            modelBuilder.Entity("Motivision.Core.Business.Entities.Skill", b =>
+            modelBuilder.Entity("Motivision.Core.Business.Entities.Goal", b =>
                 {
-                    b.Navigation("FocusSessions");
+                    b.Navigation("Steps");
                 });
 #pragma warning restore 612, 618
         }

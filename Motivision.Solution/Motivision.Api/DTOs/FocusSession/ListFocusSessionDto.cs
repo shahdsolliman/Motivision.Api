@@ -1,6 +1,6 @@
 ﻿using Motivision.Core.Business.Enums;
 
-namespace Motivision.Api.DTOs
+namespace Motivision.Api.DTOs.FocusSession
 {
     public class ListFocusSessionDto
     {
@@ -10,7 +10,7 @@ namespace Motivision.Api.DTOs
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
         public double? DurationMinutes =>
-        (StartTime.HasValue && EndTime.HasValue)
+        StartTime.HasValue && EndTime.HasValue
         ? (EndTime.Value - StartTime.Value).TotalMinutes
         : null;
     }

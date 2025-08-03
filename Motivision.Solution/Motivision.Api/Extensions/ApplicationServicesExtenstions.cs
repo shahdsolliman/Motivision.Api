@@ -101,9 +101,11 @@ namespace Motivision.Api.Extensions
         private static IServiceCollection AddUserDefinedServices(this IServiceCollection services)
         {
             services.AddScoped<ITokenService, TokenService>();
-            services.AddScoped<IFocusSessionService, FocusSessionService>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            services.AddScoped<IFocusSessionService, FocusSessionService>();
+            services.AddScoped<IGoalService, GoalService>();
+            services.AddScoped<IGoalStepService, GoalStepService>();
 
 
             return services;

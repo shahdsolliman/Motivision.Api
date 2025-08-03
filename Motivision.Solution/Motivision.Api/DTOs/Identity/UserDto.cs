@@ -1,4 +1,4 @@
-﻿namespace Motivision.API.Dtos
+﻿namespace Motivision.Api.DTOs.Identity
 {
     public class UserDto
     {

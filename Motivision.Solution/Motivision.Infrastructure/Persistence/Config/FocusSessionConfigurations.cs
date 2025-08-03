@@ -28,11 +28,6 @@ namespace Motivision.Infrastructure.Persistence.Config
                    .HasConversion(v => v.ToString(),
                    v => (SessionCategory)Enum.Parse(typeof(SessionCategory), v));
 
-            // Relationship with Skill (optional)
-            builder.HasOne(fs => fs.Skill)
-                   .WithMany(s => s.FocusSessions)
-                   .HasForeignKey(fs => fs.SkillId)
-                   .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }
